@@ -11,7 +11,6 @@ app = Flask(__name__) # starting point of my application
 
 # Load the model
 logregmodel = pickle.load(open('model.pkl', 'rb'))
-document_vectorizer = pickle.load(open('document_vectors.pkl', 'rb'))
 doc2vec_model = pickle.load(open('doc2vec_model.pkl', 'rb'))
 
 @app.route('/')
