@@ -10,7 +10,8 @@
 Create a new conda environment
 
 ```
-conda create -n mfgfinal python=3.7 -y
+<!-- conda create -n mfgfinal python=3.7 -y -->
+conda create -n mfgfinal1 python=3.11 -y
 ```
 
 To install all the packages at once
