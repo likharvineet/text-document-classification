@@ -30,5 +30,17 @@ def predict_api():
     print(output)
     return jsonify({'prediction': str(output)})
 
+@app.route('/predict', methods = ['POST'])
+def predict():
+    # data = [request.form.values()]
+    label = ['Politics', 'Sports', 'Technology', 'Entertainment', 'Business']
+    data = request.form['data']
+    print(data)
+    new_data = doc2vec_model.infer_vector(word_tokenize(data))
+    new_data = np.array(new_data).reshape(1, -1)
+    output = logregmodel.predict(new_data)[0]
+    output = label[output]
+    return render_template('home.html', prediction_text = '{}'.format(output))
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)

@@ -6,6 +6,16 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <h1>Text Document Classification</h1>
+
+    <form action="{{ url_for('predict')}}" method="post">
+        <label for="text">Enter text to classify</label>
+        <textarea name="data" id="text" cols="30" rows="10"></textarea>
+        <button type="submit">Classify</button>
+    </form>
+
+    {% if prediction_text %}
+        <h2>Prediction: {{ prediction_text }}</h2>
+    {% endif %}
 </body>
 </html>
