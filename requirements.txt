@@ -7,3 +7,4 @@ gensim
 nltk
 gunicorn
 sentence-transformers
+seaborn

@@ -9,6 +9,7 @@ nltk.download('punkt_tab')
 from nltk.tokenize import word_tokenize
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
+import seaborn as sns
 import os
 from datetime import datetime
 from sentence_transformers import SentenceTransformer
@@ -46,8 +47,16 @@ def predict():
     data = request.form['data']
     print("data \n",data)
     doc2vec_data = doc2vec_model.infer_vector(word_tokenize(data))
-    sentenceTransformer_data = sentenceTransformer.encode([data])
-    pca_data = pca_model.transform(sentenceTransformer_data)
+    # Initialize the pretrained BERT model
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+
+    # Example paragraphs
+    paragraphs = [data]
+
+    # Compute embeddings for the paragraphs
+    embeddings = model.encode(paragraphs)
+
+    pca_data = pca_model.transform(embeddings)
     print("pca data \n", pca_data)
     kmean_cluster = kmmeans_model.predict(pca_data)
     print("kmean cluster \n", kmean_cluster)
@@ -56,7 +65,7 @@ def predict():
     output = label[output]
 
     # Get the matplotlib plot  
-    plot = get_plot(kmmeans_model)
+    plot = get_plot(kmmeans_model, pca_data)
 
     
   
@@ -66,18 +75,26 @@ def predict():
     return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = 'images/' + timestamp + '.png'))
 
 # ################## For testing purpose ##################
-def get_plot(kmeans): 
+def get_plot(kmeans, new_pca_point): 
     df = pd.read_csv('pca.csv')
-    X = df.iloc[:, 0].values
-    Y = df.iloc[:, 1].values
-    plt.scatter(X,Y,c = kmeans.labels_, cmap = 'viridis')
-    plt.grid(True)
-    for center in kmeans.cluster_centers_:
-        center = center[:2]
-        plt.scatter(center[0],center[1],marker = '^',c = 'red')
-    plt.scatter(6.5, 4, marker='*')
-    plt.xlabel("petal length (cm)")
-    plt.ylabel("petal width (cm)")
+    
+    sns.set(style="whitegrid")
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(
+        x="pca1", y="pca2", hue=kmeans.labels_, data=df, palette="viridis", s=100
+    )
+    plt.scatter(
+        new_pca_point[0, 0],
+        new_pca_point[0, 1],
+        c="red",
+        s=200,
+        label="New Paragraph",
+        edgecolor="black"
+    )
+    plt.title("K-means Clustering with New Paragraph Highlighted")
+    plt.xlabel("PCA Dimension 1")
+    plt.ylabel("PCA Dimension 2")
+    plt.legend(title="Cluster", loc='upper right')
     return plt
 
 # @app.route('/predict', methods = ['POST'])
