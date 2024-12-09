@@ -54,12 +54,23 @@ def predict():
     doc2vec_data = np.array(doc2vec_data).reshape(1, -1)
     output = logregmodel.predict(doc2vec_data)[0]
     output = label[output]
-    return render_template('home.html', prediction_text = '{}'.format(output))
+
+    # Get the matplotlib plot  
+    plot = get_plot(kmmeans_model)
+
+    
+  
+    # Save the figure in the static directory  
+    timestamp = str(datetime.now().timestamp())
+    plot.savefig(os.path.join('static', 'images', timestamp +'.png'))
+    return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = 'images/' + timestamp + '.png'))
 
 # ################## For testing purpose ##################
-def get_plot(X, kmeans): 
-    pred = kmeans.fit_predict(X)
-    plt.scatter(X[:,0],X[:,1],c = pred, cmap=cm.Accent)
+def get_plot(kmeans): 
+    df = pd.read_csv('pca.csv')
+    X = df.iloc[:, 0].values
+    Y = df.iloc[:, 1].values
+    plt.scatter(X,Y,c = kmeans.labels_, cmap = 'viridis')
     plt.grid(True)
     for center in kmeans.cluster_centers_:
         center = center[:2]
