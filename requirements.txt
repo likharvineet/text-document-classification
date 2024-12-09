@@ -6,3 +6,4 @@ matplotlib
 gensim
 nltk
 gunicorn
+sentence-transformers

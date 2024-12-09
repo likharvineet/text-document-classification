@@ -3,19 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=keyboard_arrow_right" />
+    <title>Text Document Classification</title>
 </head>
 <body>
-    <h1>Text Document Classification</h1>
-
-    <form action="{{ url_for('predict')}}" method="post">
-        <label for="text">Enter text to classify</label>
-        <textarea name="data" id="text" cols="30" rows="10"></textarea>
-        <button type="submit">Classify</button>
-    </form>
-
-    {% if prediction_text %}
-        <h2>Prediction: {{ prediction_text }}</h2>
-    {% endif %}
+    <div class="container">
+        <h1>Text Document Classification</h1>
+        <div id="response">
+            {% if response %}
+                <h2>{{ response }}</h2>
+            {% endif %}
+            {% if img_path %}
+                <img src="{{ img_path }}"> 
+            {% endif %}
+            
+        </div>
+        <div id="input">
+            <form action="{{ url_for('predict')}}" method="post">
+                <!-- <label for="text">Enter text to classify</label> -->
+                <textarea class="no-scrollbar" name="data" id="text" placeholder="Enter text to classify" cols="30" rows="10"></textarea>
+                <button type="submit"><span class="material-symbols-outlined">
+                    keyboard_arrow_right
+                    </span></button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

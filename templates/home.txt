@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Text Document Classification</title>
+</head>
+<body>
+    <h1>Text Document Classification</h1>
+
+    <form action="{{ url_for('predict')}}" method="post">
+        <!-- <label for="text">Enter text to classify</label>
+        <textarea name="data" id="text" cols="30" rows="10"></textarea> -->
+
+        <label for="k">Enter value</label>
+        <input type="text" name="one" placeholder="1"> <br>
+        <input type="text" name="two" placeholder="2"> <br>
+        <input type="text" name="three" placeholder="3"> <br>
+        <input type="text" name="four" placeholder="4"> <br>
+        
+        <button type="submit">Classify</button>
+    </form>
+
+    {% if prediction_text %}
+        <h2>Prediction: {{ prediction_text }}</h2>
+    {% endif %}
+    {{ plot | safe }}
+    <img src="{{ img_path }}"> 
+</body>
+</html>
