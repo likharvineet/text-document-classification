@@ -61,15 +61,20 @@ This project focuses on classifying text documents using both supervised (Logist
 2. Create a new conda environment
 
     ```
-    conda create -n mfgfinal1 python=3.11 -y
+    conda create -n ml python=3.11 -y
+    ```
+3. Activate the new conda environment
+
+    ```
+    conda activate ml
     ```
 
-3. To install all the packages at once
+4. To install all the packages at once
 
     ```
-    pip install -r requirement.txt
+    pip install -r requirements.txt
     ```
-4. Run the Flask applicaiton locally:
+5. Run the Flask applicaiton locally:
     ```bash
     python app.py
     ```

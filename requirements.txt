@@ -8,3 +8,5 @@ nltk
 gunicorn
 sentence-transformers
 seaborn
+cloudinary
+plotly

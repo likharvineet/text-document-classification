@@ -6,6 +6,7 @@ import pandas as pd
 import gensim
 import nltk
 nltk.download('punkt_tab')
+# nltk.download('punkt-tab')
 from nltk.tokenize import word_tokenize
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
@@ -13,6 +14,10 @@ import seaborn as sns
 import os
 from datetime import datetime
 from sentence_transformers import SentenceTransformer
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+import os
 
 
 app = Flask(__name__) # starting point of my application
@@ -23,6 +28,14 @@ doc2vec_model = pickle.load(open('doc2vec_model.pkl', 'rb'))
 pca_model = pickle.load(open('pca.pkl', 'rb'))
 kmmeans_model = pickle.load(open('kmean_final.pkl', 'rb'))
 sentenceTransformer = pickle.load(open('sentenceTransformer.pkl', 'rb'))
+
+# Cloudinary Configuration 
+cloudinary.config( 
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
+    api_key = os.environ.get('CLOUDINARY_API_KEY'), 
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET'), 
+    secure=True
+)
 
 @app.route('/')
 def home():
@@ -72,7 +85,9 @@ def predict():
     # Save the figure in the static directory  
     timestamp = str(datetime.now().timestamp())
     plot.savefig(os.path.join('static', 'images', timestamp +'.png'))
-    return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = 'images/' + timestamp + '.png'))
+    # Upload the image to Cloudinary
+    response = cloudinary.uploader.upload(os.path.join('static', 'images', timestamp +'.png'))
+    return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = response["secure_url"]))
 
 # ################## For testing purpose ##################
 def get_plot(kmeans, new_pca_point): 
