@@ -10,6 +10,8 @@ nltk.download('punkt_tab')
 from nltk.tokenize import word_tokenize
 import matplotlib.pyplot as plt 
 import matplotlib.cm as cm
+import matplotlib
+matplotlib.use('agg')
 import seaborn as sns
 import os
 from datetime import datetime
@@ -18,9 +20,14 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__) # starting point of my application
+app.config['CLOUDINARY_CLOUD_NAME'] = os.getenv('CLOUDINARY_CLOUD_NAME')
+app.config['CLOUDINARY_API_KEY'] = os.getenv('CLOUDINARY_API_KEY')
+app.config['CLOUDINARY_API_SECRET'] = os.getenv('CLOUDINARY_API_SECRET')
 
 # Load the model
 logregmodel = pickle.load(open('model.pkl', 'rb'))
@@ -31,9 +38,9 @@ sentenceTransformer = pickle.load(open('sentenceTransformer.pkl', 'rb'))
 
 # Cloudinary Configuration 
 cloudinary.config( 
-    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
-    api_key = os.environ.get('CLOUDINARY_API_KEY'), 
-    api_secret = os.environ.get('CLOUDINARY_API_SECRET'), 
+    cloud_name = app.config['CLOUDINARY_CLOUD_NAME'], 
+    api_key = app.config['CLOUDINARY_API_KEY'], 
+    api_secret = app.config['CLOUDINARY_API_SECRET'], 
     secure=True
 )
 
@@ -56,6 +63,7 @@ def predict_api():
 @app.route('/predict', methods = ['POST'])
 def predict():
     # data = [request.form.values()]
+    print("api", app.config['CLOUDINARY_CLOUD_NAME'])
     label = ['Politics', 'Sports', 'Technology', 'Entertainment', 'Business']
     data = request.form['data']
     print("data \n",data)
@@ -76,6 +84,7 @@ def predict():
     doc2vec_data = np.array(doc2vec_data).reshape(1, -1)
     output = logregmodel.predict(doc2vec_data)[0]
     output = label[output]
+    print("output", output)
 
     # Get the matplotlib plot  
     plot = get_plot(kmmeans_model, pca_data)
@@ -87,13 +96,17 @@ def predict():
     plot.savefig(os.path.join('static', 'images', timestamp +'.png'))
     # Upload the image to Cloudinary
     response = cloudinary.uploader.upload(os.path.join('static', 'images', timestamp +'.png'))
-    return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = response["secure_url"]))
+    if(response):
+        os.remove(os.path.join('static', 'images', timestamp +'.png'))
+    
+    return render_template('home.html', prediction_text = '{}'.format(output), img_path = response['url'])
+    # return render_template('home.html', prediction_text = '{}'.format(output), img_path = url_for('static', filename = response["secure_url"]))
 
 # ################## For testing purpose ##################
-def get_plot(kmeans, new_pca_point): 
+def get_plot(kmeans, new_pca_point):
     df = pd.read_csv('pca.csv')
-    
-    # Define cluster names
+
+     # Define cluster names
     cluster_names = {
         0: "Politics",
         1: "Business",
@@ -131,22 +144,21 @@ def get_plot(kmeans, new_pca_point):
             ha='center',  # Center-align text
             bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3')  # Add a box around the text
         )
-    plt.scatter(
-    new_pca_point[0, 0],
-    new_pca_point[0, 1],
-    c="red",
-    s=200,
-    label="New Paragraph",
-    edgecolor="black"
-)
+        plt.scatter(
+            new_pca_point[0, 0],
+            new_pca_point[0, 1],
+            c="red",
+            s=200,
+            label="New Paragraph",
+            edgecolor="black"
+        )
 
-    plt.title("K-means Clustering with Cluster Names Annotated at Centroids")
-    plt.xlabel("PCA Dimension 1")
-    plt.ylabel("PCA Dimension 2")
+        plt.title("K-means Clustering with Cluster Names Annotated at Centroids")
+        plt.xlabel("PCA Dimension 1")
+        plt.ylabel("PCA Dimension 2")
 
-    plt.tight_layout()
-    return plt
-   
+        plt.tight_layout()
+        return plt   
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
