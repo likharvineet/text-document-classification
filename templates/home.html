@@ -11,8 +11,8 @@
     <div class="container">
         <h1>Text Document Classification</h1>
         <div id="response">
-            {% if response %}
-                <h2>{{ response }}</h2>
+            {% if prediction_text %}
+                <h2>{{ prediction_text }}</h2>
             {% endif %}
             {% if img_path %}
                 <img src="{{ img_path }}"> 

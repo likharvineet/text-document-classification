@@ -7,3 +7,5 @@ gensim
 nltk
 gunicorn
 sentence-transformers
+plotly
+seaborn
