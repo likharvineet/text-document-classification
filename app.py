@@ -20,9 +20,9 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 app = Flask(__name__) # starting point of my application
 app.config['CLOUDINARY_CLOUD_NAME'] = os.getenv('CLOUDINARY_CLOUD_NAME')
@@ -38,11 +38,17 @@ sentenceTransformer = pickle.load(open('sentenceTransformer.pkl', 'rb'))
 
 # Cloudinary Configuration 
 cloudinary.config( 
-    cloud_name = app.config['CLOUDINARY_CLOUD_NAME'], 
-    api_key = app.config['CLOUDINARY_API_KEY'], 
-    api_secret = app.config['CLOUDINARY_API_SECRET'], 
+    cloud_name = os.environ['CLOUDINARY_CLOUD_NAME'], 
+    api_key = os.environ['CLOUDINARY_API_KEY'], 
+    api_secret = os.environ['CLOUDINARY_API_SECRET'], 
     secure=True
 )
+# cloudinary.config( 
+#     cloud_name = app.config['CLOUDINARY_CLOUD_NAME'], 
+#     api_key = app.config['CLOUDINARY_API_KEY'], 
+#     api_secret = app.config['CLOUDINARY_API_SECRET'], 
+#     secure=True
+# )
 
 @app.route('/')
 def home():
